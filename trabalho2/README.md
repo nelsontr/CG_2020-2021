@@ -3,10 +3,10 @@
 - [X] Mesa
 - [X] Tacos
 - [X] Buracos
-- [] Camaras
-- [] Rotação Tacos
-- [] Bolas
-- [] Colisões
-- [] (...)
+- [ ] Camaras
+- [ ] Rotação Tacos
+- [ ] Bolas
+- [ ] Colisões
+- [ ] (...)
 
 

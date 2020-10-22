@@ -13,7 +13,7 @@
 /*      Variables     */
 var clock;
 var size = 150;
-var BALLRADIUM = 50;
+var BALLRADIUM = 2;
 var cameraIndex = 1;
 var scene, renderer;
 var geometry, material, mesh;
@@ -70,7 +70,8 @@ function createScene() {
   scene.add(new THREE.AxisHelper(10));
 
   createTable(0, 0, 0);
-  createTacos(0, 0, 0);
+  createTacos();
+  createHoles();
 }
 
 /*******************************************************************
@@ -163,6 +164,18 @@ function keyNotPressed(e) {
  *   OBJECTS
  *
  *******************************************************************/
+function createHoles() {
+  var Holes = new THREE.Object3D();
+
+  createHole(Holes, -11, 0, -41)
+  createHole(Holes, 11, 0, 41)
+  createHole(Holes, -11, 0, 41)
+  createHole(Holes, 11, 0, -41)
+  scene.add(Holes);
+}
+
+
+
 function createTable(x, y, z) {
   var table = new THREE.Object3D();
 
@@ -178,20 +191,56 @@ function createTable(x, y, z) {
   table.position.z = z;
 }
 
-function createTacos(x, y, z) {
-	var taco = new THREE.Object3D();
+function createTacos() {
+  var taco1 = createTaco(35, 2.5, 22.5, Math.PI / 2);
+  var taco2 = createTaco(35, 2.5, -22.5, Math.PI / 2);
+  var taco3 = createTaco(-35, 2.5, 22.5, -Math.PI / 2);
+  var taco4 = createTaco(-35, 2.5, -22.5, -Math.PI / 2);
+  var taco5 = createTacoPoints(0, 2.5, -65, Math.PI / 2);
+  var taco6 = createTacoPoints(0, 2.5, 65, -Math.PI / 2);
 
-	geometry = new THREE.CylinderGeometry( 1, 2, 40, 20);
-	mesh = new THREE.Mesh(geometry, material);
-	mesh.position.set(35, 2.5 , 22.5);
-	mesh.rotateZ(Math.PI / 2);
-	taco.add(mesh);
+  scene.add(taco1);
+  scene.add(taco2);
+  scene.add(taco3);
+  scene.add(taco4);
+  scene.add(taco5);
+  scene.add(taco6);
+}
 
-	scene.add(taco);
-  taco.position.x = x;
-  taco.position.y = y;
-  taco.position.z = z;
+function createHole(hole, x, y, z) {
 
+  geometry = new THREE.CylinderGeometry(4, 4, 1);
+  material = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true });
+  mesh = new THREE.Mesh(geometry, material);
+
+  mesh.position.set(x, y, z);
+  hole.add(mesh);
+}
+
+function createTaco(x, y, z, rot) {
+  var taco = new THREE.Object3D();
+
+  geometry = new THREE.CylinderGeometry(1, 2, 40, 20);
+  material = new THREE.MeshBasicMaterial({ color: 0xbe935a, wireframe: true });
+  mesh = new THREE.Mesh(geometry, material);
+  taco.add(mesh);
+
+  mesh.position.set(x, y, z);
+  mesh.rotateZ(rot);
+  return taco
+}
+
+function createTacoPoints(x, y, z, rot) {
+  var taco = new THREE.Object3D();
+
+  geometry = new THREE.CylinderGeometry(1, 2, 40, 20);
+  material = new THREE.MeshBasicMaterial({ color: 0xbe935a, wireframe: true });
+  mesh = new THREE.Mesh(geometry, material);
+  taco.add(mesh);
+
+  mesh.position.set(x, y, z);
+  mesh.rotateX(rot);
+  return taco
 }
 
 function createWallZ(obj, x, y, z) {
@@ -205,8 +254,8 @@ function createWallZ(obj, x, y, z) {
 }
 
 function createWallX(obj, x, y, z) {
-  material = new THREE.MeshBasicMaterial({ color: 0xfffa500, wireframe: true });
   geometry = new THREE.CubeGeometry(5, 1, 90);
+  material = new THREE.MeshBasicMaterial({ color: 0xfffa500, wireframe: true });
   mesh = new THREE.Mesh(geometry, material);
   mesh.position.set(x, y, z);
   mesh.rotateZ(Math.PI / 2);

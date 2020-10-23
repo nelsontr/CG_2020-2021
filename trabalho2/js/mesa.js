@@ -57,10 +57,8 @@ function render() {
     renderer.render(scene, frontcam);
   }
   //else if (cameraIndex == 3) { renderer.render(scene, latcam) }
-  tacoMesh[tacoSelected-1].rotateX(Math.PI/60);
-  console.log(tacoMesh[tacoSelected-1].rotation);
-
-  console.log("Ola");
+  //tacoMesh[tacoSelected-1].rotateX(Math.PI/60);
+  //console.log(tacoMesh[tacoSelected-1].rotation);
 }
 
 /*******************************************************************
@@ -120,11 +118,6 @@ function createTopCamera() {
 function createMovilCamera() {
   "use strict";
 
-  /*latcam = new THREE.OrthographicCamera(-100 , 100 , 0, -200, 400, 600);
-    latcam.position.x = 500;
-    latcam.lookAt(scene.position);
-    scene.add(latcam);*/
-
 }
 
 /*******************************************************************
@@ -175,6 +168,7 @@ function onKeyDown(e) {
     tacoMesh[tacoSelected-1].material.color.setHex(0xbe935a)
     tacoSelected = 6;
   }
+
   tacoMesh[tacoSelected-1].material.color.setHex(0x0000ff)
 }
 
@@ -221,8 +215,6 @@ function createTacos() {
   var taco5 = createTacoPoints(5, 0, 2.5, -60, Math.PI / 2);
   var taco6 = createTacoPoints(6, 0, 2.5, 60, -Math.PI / 2);
   
-  tacoMesh[tacoSelected-1].material.color.setHex(0x0000ff)
-  
   scene.add(taco1);
   scene.add(taco2);
   scene.add(taco3);
@@ -260,6 +252,7 @@ function createTacoPoints(selected, x, y, z, rot) {
 
   geometry = new THREE.CylinderGeometry(1, 2, 30);
   material = new THREE.MeshBasicMaterial({ color: 0xbe935a , wireframe: true });
+
   tacoMesh[selected-1] = new THREE.Mesh(geometry, material);
   taco.add(tacoMesh[selected-1]);
 

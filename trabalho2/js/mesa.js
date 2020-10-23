@@ -57,8 +57,6 @@ function render() {
     renderer.render(scene, frontcam);
   }
   //else if (cameraIndex == 3) { renderer.render(scene, latcam) }
-  tacoMesh[tacoSelected-1].rotateX(Math.PI/60);
-  console.log(tacoMesh[tacoSelected-1].rotation);
 }
 
 /*******************************************************************
@@ -150,26 +148,32 @@ function onKeyDown(e) {
     // keyCode tecla 3
     cameraIndex = 3;
   } else if (e.keyCode == 52) {
-    tacoMesh[tacoSelected-1].material.color.setHex(0xbe935a)
+    tacoMesh[tacoSelected - 1].material.color.setHex(0xbe935a)
     tacoSelected = 1;
   } else if (e.keyCode == 53) {
-    tacoMesh[tacoSelected-1].material.color.setHex(0xbe935a)
+    tacoMesh[tacoSelected - 1].material.color.setHex(0xbe935a)
     tacoSelected = 2;
   } else if (e.keyCode == 54) {
-    tacoMesh[tacoSelected-1].material.color.setHex(0xbe935a)
+    tacoMesh[tacoSelected - 1].material.color.setHex(0xbe935a)
     tacoSelected = 3;
   } else if (e.keyCode == 55) {
-    tacoMesh[tacoSelected-1].material.color.setHex(0xbe935a)
+    tacoMesh[tacoSelected - 1].material.color.setHex(0xbe935a)
     tacoSelected = 4;
   } else if (e.keyCode == 56) {
-    tacoMesh[tacoSelected-1].material.color.setHex(0xbe935a)
+    tacoMesh[tacoSelected - 1].material.color.setHex(0xbe935a)
     tacoSelected = 5;
   } else if (e.keyCode == 57) {
-    tacoMesh[tacoSelected-1].material.color.setHex(0xbe935a)
+    tacoMesh[tacoSelected - 1].material.color.setHex(0xbe935a)
     tacoSelected = 6;
+  } else if (e.keyCode == 37) { //keyCode for left-arrow
+    if (tacoSelected < 5) tacoMesh[tacoSelected - 1].rotateX(Math.PI / 60);
+    else tacoMesh[tacoSelected - 1].rotateZ(Math.PI / 60);
+  } else if (e.keyCode == 39) { //keyCode for right-arrow
+    if (tacoSelected < 5) tacoMesh[tacoSelected - 1].rotateX(-Math.PI / 60);
+    else tacoMesh[tacoSelected - 1].rotateZ(-Math.PI / 60);
   }
 
-  tacoMesh[tacoSelected-1].material.color.setHex(0x0000ff)
+  tacoMesh[tacoSelected - 1].material.color.setHex(0x0000ff)
 }
 
 function keyNotPressed(e) {
@@ -185,10 +189,10 @@ function keyNotPressed(e) {
 function createHoles() {
   var Holes = new THREE.Object3D();
 
-  createHole(Holes, -11, 0, -41)
-  createHole(Holes, 11, 0, 41)
-  createHole(Holes, -11, 0, 41)
-  createHole(Holes, 11, 0, -41)
+  createHole(Holes, -11, -41)
+  createHole(Holes, 11, 41)
+  createHole(Holes, -11, 41)
+  createHole(Holes, 11, -41)
   scene.add(Holes);
 }
 
@@ -198,35 +202,27 @@ function createTable(x, y, z) {
   var table = new THREE.Object3D();
 
   createBottom(table, 0, 0, 0);
-  createWallX(table, -15.5, 3, 0);
-  createWallX(table, 15.5, 3, 0);
-  createWallZ(table, 0, 3, 45.5);
-  createWallZ(table, 0, 3, -45.5);
+  createWall(table, -15.5, 0, 90);
+  createWall(table, 15.5, 0, 90);
+  createWall(table, 0, 45.5);
+  createWall(table, 0, -45.5);
 
   scene.add(table);
   table.position.set(x, y, z)
 }
 
 function createTacos() {
-  var taco1 = createTaco(1, 30, 2.5, 22.5, Math.PI / 2);
-  var taco2 = createTaco(2, 30, 2.5, -22.5, Math.PI / 2);
-  var taco3 = createTaco(3, -30, 2.5, 22.5, -Math.PI / 2);
-  var taco4 = createTaco(4, -30, 2.5, -22.5, -Math.PI / 2);
-  var taco5 = createTacoPoints(5, 0, 2.5, -60, Math.PI / 2);
-  var taco6 = createTacoPoints(6, 0, 2.5, 60, -Math.PI / 2);
+  scene.add(createTaco(1, 15, 22.5));
+  scene.add(createTaco(2, -15, 22.5));
+  scene.add(createTaco(3, 15, -22.5));
+  scene.add(createTaco(4, -15, -22.5));
+  scene.add(createTaco(5, 0, -45));
+  scene.add(createTaco(6, 0, 45));
   
-  tacoMesh[tacoSelected-1].material.color.setHex(0x0000ff)
-
-  scene.add(taco1);
-  scene.add(taco2);
-  scene.add(taco3);
-  scene.add(taco4);
-  scene.add(taco5);
-  scene.add(taco6);
+  tacoMesh[tacoSelected - 1].material.color.setHex(0x0000ff);
 }
 
-function createHole(hole, x, y, z) {
-
+function createHole(hole, x, z, y=0) {
   geometry = new THREE.CylinderGeometry(4, 4, 1);
   material = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true });
   mesh = new THREE.Mesh(geometry, material);
@@ -235,53 +231,36 @@ function createHole(hole, x, y, z) {
   hole.add(mesh);
 }
 
-function createTaco(selected, x, y, z, rot) {
+function createTaco(selected, x, z) {
+  
+  if (selected % 2 != 0) var rot = Math.PI / 2
+  else var rot = -Math.PI / 2
+  
   var taco = new THREE.Object3D();
-
   geometry = new THREE.CylinderGeometry(1, 2, 30);
-  material = new THREE.MeshBasicMaterial({ color: 0xbe935a , wireframe: true });
+  material = new THREE.MeshBasicMaterial({ color: 0xbe935a, wireframe: true });
 
-  tacoMesh[selected-1] = new THREE.Mesh(geometry, material);
-  taco.add(tacoMesh[selected-1]);
+  tacoMesh[selected - 1] = new THREE.Mesh(geometry, material);
+  if (selected < 5) tacoMesh[selected - 1].rotateZ(rot);
+  else tacoMesh[selected - 1].rotateX(rot);
 
-  tacoMesh[selected-1].position.set(x, y, z);
-  tacoMesh[selected-1].rotateZ(rot);
+  tacoMesh[selected - 1].position.set(x, 2.5, z);
+  taco.add(tacoMesh[selected - 1]);
   return taco
 }
 
-function createTacoPoints(selected, x, y, z, rot) {
-  var taco = new THREE.Object3D();
-
-  geometry = new THREE.CylinderGeometry(1, 2, 30);
-  material = new THREE.MeshBasicMaterial({ color: 0xbe935a , wireframe: true });
-
-  tacoMesh[selected-1] = new THREE.Mesh(geometry, material);
-  taco.add(tacoMesh[selected-1]);
-
-  tacoMesh[selected-1].position.set(x, y, z);
-  tacoMesh[selected-1].rotateX(rot);
-  return taco
-}
-
-function createWallZ(obj, x, y, z) {
-  geometry = new THREE.CubeGeometry(5, 1, 30);
+function createWall(obj, x, z, size = 30) {
+  geometry = new THREE.CubeGeometry(5, 1, size);
   material = new THREE.MeshBasicMaterial({ color: 0xffa500, wireframe: true });
   mesh = new THREE.Mesh(geometry, material);
-  mesh.position.set(x, y, z);
+
   mesh.rotateZ(Math.PI / 2);
-  mesh.rotateX(Math.PI / 2);
+  if (size == 30) mesh.rotateX(Math.PI / 2);
+
+  mesh.position.set(x, 3, z);
   obj.add(mesh);
 }
 
-function createWallX(obj, x, y, z) {
-  geometry = new THREE.CubeGeometry(5, 1, 90);
-  material = new THREE.MeshBasicMaterial({ color: 0xfffa500, wireframe: true });
-  mesh = new THREE.Mesh(geometry, material);
-
-  mesh.rotateZ(Math.PI / 2);
-  mesh.position.set(x, y, z);
-  obj.add(mesh);
-}
 
 function createBottom(obj, x, y, z) {
   material = new THREE.MeshBasicMaterial({ color: 0x32cd32, wireframe: true });

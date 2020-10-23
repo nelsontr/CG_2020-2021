@@ -3,9 +3,9 @@
 - [X] Mesa
 - [X] Tacos
 - [X] Buracos
-- [ ] Camaras
 - [ ] Rotação Tacos
 - [ ] Bolas
+- [ ] Camara da Bola
 - [ ] Colisões
 - [ ] (...)
 

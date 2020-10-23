@@ -19,7 +19,8 @@ var scene, renderer;
 var geometry, material, mesh;
 var frontcam, topcam, latcam;
 var aspect = window.innerWidth / window.innerHeight;
-
+var taco1;
+var xo = [];
 
 function init() {
   "use strict";
@@ -57,6 +58,7 @@ function render() {
     renderer.render(scene, frontcam);
   }
   //else if (cameraIndex == 3) { renderer.render(scene, latcam) }
+
 }
 
 /*******************************************************************
@@ -73,6 +75,7 @@ function createScene() {
   createTable(0, 0, 0);
   createTacos();
   createHoles();
+  console.log(taco1)
 }
 
 /*******************************************************************
@@ -153,18 +156,25 @@ function onKeyDown(e) {
     // keyCode tecla 3
     cameraIndex = 3;
   } else if (e.keyCode == 52) {
+    xo[tacoSelected-1].material.color.setHex(0xbe935a)
     tacoSelected = 1;
   } else if (e.keyCode == 53) {
+    xo[tacoSelected-1].material.color.setHex(0xbe935a)
     tacoSelected = 2;
   } else if (e.keyCode == 54) {
+    xo[tacoSelected-1].material.color.setHex(0xbe935a)
     tacoSelected = 3;
   } else if (e.keyCode == 55) {
+    xo[tacoSelected-1].material.color.setHex(0xbe935a)
     tacoSelected = 4;
   } else if (e.keyCode == 56) {
+    xo[tacoSelected-1].material.color.setHex(0xbe935a)
     tacoSelected = 5;
   } else if (e.keyCode == 57) {
+    xo[tacoSelected-1].material.color.setHex(0xbe935a)
     tacoSelected = 6;
   }
+  xo[tacoSelected-1].material.color.setHex(0x0000ff)
 }
 
 function keyNotPressed(e) {
@@ -203,19 +213,15 @@ function createTable(x, y, z) {
 }
 
 function createTacos() {
-  if (tacoSelected == 1) var taco1 = createTaco(1, 30, 2.5, 22.5, Math.PI / 2);
-  else var taco1 = createTaco(0, 30, 2.5, 22.5, Math.PI / 2);
-  if (tacoSelected == 2) var taco2 = createTaco(1, 30, 2.5, -22.5, Math.PI / 2);
-  else taco2 = createTaco(0, 30, 2.5, -22.5, Math.PI / 2);
-  if (tacoSelected == 3) var taco3 = createTaco(1, -30, 2.5, 22.5, -Math.PI / 2);
-  else taco3 = createTaco(0, -30, 2.5, 22.5, -Math.PI / 2);
-  if (tacoSelected == 4) var taco4 = createTaco(1, -30, 2.5, -22.5, -Math.PI / 2);
-  else taco4 = createTaco(0, -30, 2.5, -22.5, -Math.PI / 2);
-  if (tacoSelected == 5) var taco5 = createTacoPoints(1, 0, 2.5, -60, Math.PI / 2);
-  else taco5 = createTacoPoints(0, 0, 2.5, -60, Math.PI / 2);
-  if (tacoSelected == 6) var taco6 = createTacoPoints(1, 0, 2.5, 60, -Math.PI / 2);
-  else taco6 = createTacoPoints(0, 0, 2.5, 60, -Math.PI / 2);
-
+  var taco1 = createTaco(1, 30, 2.5, 22.5, Math.PI / 2);
+  var taco2 = createTaco(2, 30, 2.5, -22.5, Math.PI / 2);
+  var taco3 = createTaco(3, -30, 2.5, 22.5, -Math.PI / 2);
+  var taco4 = createTaco(4, -30, 2.5, -22.5, -Math.PI / 2);
+  var taco5 = createTacoPoints(5, 0, 2.5, -60, Math.PI / 2);
+  var taco6 = createTacoPoints(6, 0, 2.5, 60, -Math.PI / 2);
+  
+  xo[tacoSelected-1].material.color.setHex(0x0000ff)
+  
   scene.add(taco1);
   scene.add(taco2);
   scene.add(taco3);
@@ -238,19 +244,13 @@ function createTaco(selected, x, y, z, rot) {
   var taco = new THREE.Object3D();
 
   geometry = new THREE.CylinderGeometry(1, 2, 30);
-  if (selected){
-    material = new THREE.MeshBasicMaterial({ color: 0xbbbbbb, wireframe: true });
-    taco.setColor = function(color){
-      taco.material.color.set(color);
-    }
-  }
+  material = new THREE.MeshBasicMaterial({ color: 0xbe935a , wireframe: true });
 
-  else material = new THREE.MeshBasicMaterial({ color: 0xbe935a, wireframe: true });
-  mesh = new THREE.Mesh(geometry, material);
-  taco.add(mesh);
+  xo[selected-1] = new THREE.Mesh(geometry, material);
+  taco.add(xo[selected-1]);
 
-  mesh.position.set(x, y, z);
-  mesh.rotateZ(rot);
+  xo[selected-1].position.set(x, y, z);
+  xo[selected-1].rotateZ(rot);
   return taco
 }
 
@@ -258,13 +258,12 @@ function createTacoPoints(selected, x, y, z, rot) {
   var taco = new THREE.Object3D();
 
   geometry = new THREE.CylinderGeometry(1, 2, 30);
-  if (selected) material = new THREE.MeshBasicMaterial({ color: 0xbbbbbb, wireframe: true });
-  else material = new THREE.MeshBasicMaterial({ color: 0xbe935a, wireframe: true });
-  mesh = new THREE.Mesh(geometry, material);
-  taco.add(mesh);
+  material = new THREE.MeshBasicMaterial({ color: 0xbe935a , wireframe: true });
+  xo[selected-1] = new THREE.Mesh(geometry, material);
+  taco.add(xo[selected-1]);
 
-  mesh.position.set(x, y, z);
-  mesh.rotateX(rot);
+  xo[selected-1].position.set(x, y, z);
+  xo[selected-1].rotateX(rot);
   return taco
 }
 

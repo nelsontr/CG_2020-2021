@@ -57,8 +57,8 @@ function render() {
     renderer.render(scene, frontcam);
   }
   //else if (cameraIndex == 3) { renderer.render(scene, latcam) }
-  //tacoMesh[tacoSelected-1].rotateX(Math.PI/60);
-  //console.log(tacoMesh[tacoSelected-1].rotation);
+  tacoMesh[tacoSelected-1].rotateX(Math.PI/60);
+  console.log(tacoMesh[tacoSelected-1].rotation);
 }
 
 /*******************************************************************
@@ -215,6 +215,8 @@ function createTacos() {
   var taco5 = createTacoPoints(5, 0, 2.5, -60, Math.PI / 2);
   var taco6 = createTacoPoints(6, 0, 2.5, 60, -Math.PI / 2);
   
+  tacoMesh[tacoSelected-1].material.color.setHex(0x0000ff)
+
   scene.add(taco1);
   scene.add(taco2);
   scene.add(taco3);

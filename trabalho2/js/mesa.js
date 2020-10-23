@@ -14,11 +14,12 @@
 var clock;
 var size = 150;
 var BALLRADIUM = 2;
-var cameraIndex = 1;
+var cameraIndex = 1, tacoSelected = 1;
 var scene, renderer;
 var geometry, material, mesh;
 var frontcam, topcam, latcam;
 var aspect = window.innerWidth / window.innerHeight;
+
 
 function init() {
   "use strict";
@@ -90,8 +91,8 @@ function createCameras() {
 function createFrontCamera() {
   "use strict";
 
-  frontcam = new THREE.OrthographicCamera(-65, 65, 10, -120, 600, 800);
-  frontcam.position.z = 700;
+  frontcam = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
+  frontcam.position.set(100, 125, 100);
   frontcam.lookAt(scene.position);
   scene.add(frontcam);
 }
@@ -151,6 +152,18 @@ function onKeyDown(e) {
   } else if (e.keyCode == 51) {
     // keyCode tecla 3
     cameraIndex = 3;
+  } else if (e.keyCode == 52) {
+    tacoSelected = 1;
+  } else if (e.keyCode == 53) {
+    tacoSelected = 2;
+  } else if (e.keyCode == 54) {
+    tacoSelected = 3;
+  } else if (e.keyCode == 55) {
+    tacoSelected = 4;
+  } else if (e.keyCode == 56) {
+    tacoSelected = 5;
+  } else if (e.keyCode == 57) {
+    tacoSelected = 6;
   }
 }
 
@@ -186,18 +199,22 @@ function createTable(x, y, z) {
   createWallZ(table, 0, 3, -45.5);
 
   scene.add(table);
-  table.position.x = x;
-  table.position.y = y;
-  table.position.z = z;
+  table.position.set(x, y, z)
 }
 
 function createTacos() {
-  var taco1 = createTaco(35, 2.5, 22.5, Math.PI / 2);
-  var taco2 = createTaco(35, 2.5, -22.5, Math.PI / 2);
-  var taco3 = createTaco(-35, 2.5, 22.5, -Math.PI / 2);
-  var taco4 = createTaco(-35, 2.5, -22.5, -Math.PI / 2);
-  var taco5 = createTacoPoints(0, 2.5, -65, Math.PI / 2);
-  var taco6 = createTacoPoints(0, 2.5, 65, -Math.PI / 2);
+  if (tacoSelected == 1) var taco1 = createTaco(1, 30, 2.5, 22.5, Math.PI / 2);
+  else var taco1 = createTaco(0, 30, 2.5, 22.5, Math.PI / 2);
+  if (tacoSelected == 2) var taco2 = createTaco(1, 30, 2.5, -22.5, Math.PI / 2);
+  else taco2 = createTaco(0, 30, 2.5, -22.5, Math.PI / 2);
+  if (tacoSelected == 3) var taco3 = createTaco(1, -30, 2.5, 22.5, -Math.PI / 2);
+  else taco3 = createTaco(0, -30, 2.5, 22.5, -Math.PI / 2);
+  if (tacoSelected == 4) var taco4 = createTaco(1, -30, 2.5, -22.5, -Math.PI / 2);
+  else taco4 = createTaco(0, -30, 2.5, -22.5, -Math.PI / 2);
+  if (tacoSelected == 5) var taco5 = createTacoPoints(1, 0, 2.5, -60, Math.PI / 2);
+  else taco5 = createTacoPoints(0, 0, 2.5, -60, Math.PI / 2);
+  if (tacoSelected == 6) var taco6 = createTacoPoints(1, 0, 2.5, 60, -Math.PI / 2);
+  else taco6 = createTacoPoints(0, 0, 2.5, 60, -Math.PI / 2);
 
   scene.add(taco1);
   scene.add(taco2);
@@ -217,11 +234,18 @@ function createHole(hole, x, y, z) {
   hole.add(mesh);
 }
 
-function createTaco(x, y, z, rot) {
+function createTaco(selected, x, y, z, rot) {
   var taco = new THREE.Object3D();
 
-  geometry = new THREE.CylinderGeometry(1, 2, 40, 20);
-  material = new THREE.MeshBasicMaterial({ color: 0xbe935a, wireframe: true });
+  geometry = new THREE.CylinderGeometry(1, 2, 30);
+  if (selected){
+    material = new THREE.MeshBasicMaterial({ color: 0xbbbbbb, wireframe: true });
+    taco.setColor = function(color){
+      taco.material.color.set(color);
+    }
+  }
+
+  else material = new THREE.MeshBasicMaterial({ color: 0xbe935a, wireframe: true });
   mesh = new THREE.Mesh(geometry, material);
   taco.add(mesh);
 
@@ -230,11 +254,12 @@ function createTaco(x, y, z, rot) {
   return taco
 }
 
-function createTacoPoints(x, y, z, rot) {
+function createTacoPoints(selected, x, y, z, rot) {
   var taco = new THREE.Object3D();
 
-  geometry = new THREE.CylinderGeometry(1, 2, 40, 20);
-  material = new THREE.MeshBasicMaterial({ color: 0xbe935a, wireframe: true });
+  geometry = new THREE.CylinderGeometry(1, 2, 30);
+  if (selected) material = new THREE.MeshBasicMaterial({ color: 0xbbbbbb, wireframe: true });
+  else material = new THREE.MeshBasicMaterial({ color: 0xbe935a, wireframe: true });
   mesh = new THREE.Mesh(geometry, material);
   taco.add(mesh);
 
@@ -257,8 +282,9 @@ function createWallX(obj, x, y, z) {
   geometry = new THREE.CubeGeometry(5, 1, 90);
   material = new THREE.MeshBasicMaterial({ color: 0xfffa500, wireframe: true });
   mesh = new THREE.Mesh(geometry, material);
-  mesh.position.set(x, y, z);
+
   mesh.rotateZ(Math.PI / 2);
+  mesh.position.set(x, y, z);
   obj.add(mesh);
 }
 

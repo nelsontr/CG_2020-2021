@@ -13,14 +13,13 @@
 /*      Variables     */
 var clock;
 var size = 150;
+var tacoMesh = [];
 var BALLRADIUM = 2;
 var cameraIndex = 1, tacoSelected = 1;
 var scene, renderer;
 var geometry, material, mesh;
 var frontcam, topcam, latcam;
 var aspect = window.innerWidth / window.innerHeight;
-var taco1;
-var xo = [];
 
 function init() {
   "use strict";
@@ -58,7 +57,10 @@ function render() {
     renderer.render(scene, frontcam);
   }
   //else if (cameraIndex == 3) { renderer.render(scene, latcam) }
+  tacoMesh[tacoSelected-1].rotateX(Math.PI/60);
+  console.log(tacoMesh[tacoSelected-1].rotation);
 
+  console.log("Ola");
 }
 
 /*******************************************************************
@@ -75,7 +77,6 @@ function createScene() {
   createTable(0, 0, 0);
   createTacos();
   createHoles();
-  console.log(taco1)
 }
 
 /*******************************************************************
@@ -156,25 +157,25 @@ function onKeyDown(e) {
     // keyCode tecla 3
     cameraIndex = 3;
   } else if (e.keyCode == 52) {
-    xo[tacoSelected-1].material.color.setHex(0xbe935a)
+    tacoMesh[tacoSelected-1].material.color.setHex(0xbe935a)
     tacoSelected = 1;
   } else if (e.keyCode == 53) {
-    xo[tacoSelected-1].material.color.setHex(0xbe935a)
+    tacoMesh[tacoSelected-1].material.color.setHex(0xbe935a)
     tacoSelected = 2;
   } else if (e.keyCode == 54) {
-    xo[tacoSelected-1].material.color.setHex(0xbe935a)
+    tacoMesh[tacoSelected-1].material.color.setHex(0xbe935a)
     tacoSelected = 3;
   } else if (e.keyCode == 55) {
-    xo[tacoSelected-1].material.color.setHex(0xbe935a)
+    tacoMesh[tacoSelected-1].material.color.setHex(0xbe935a)
     tacoSelected = 4;
   } else if (e.keyCode == 56) {
-    xo[tacoSelected-1].material.color.setHex(0xbe935a)
+    tacoMesh[tacoSelected-1].material.color.setHex(0xbe935a)
     tacoSelected = 5;
   } else if (e.keyCode == 57) {
-    xo[tacoSelected-1].material.color.setHex(0xbe935a)
+    tacoMesh[tacoSelected-1].material.color.setHex(0xbe935a)
     tacoSelected = 6;
   }
-  xo[tacoSelected-1].material.color.setHex(0x0000ff)
+  tacoMesh[tacoSelected-1].material.color.setHex(0x0000ff)
 }
 
 function keyNotPressed(e) {
@@ -220,7 +221,7 @@ function createTacos() {
   var taco5 = createTacoPoints(5, 0, 2.5, -60, Math.PI / 2);
   var taco6 = createTacoPoints(6, 0, 2.5, 60, -Math.PI / 2);
   
-  xo[tacoSelected-1].material.color.setHex(0x0000ff)
+  tacoMesh[tacoSelected-1].material.color.setHex(0x0000ff)
   
   scene.add(taco1);
   scene.add(taco2);
@@ -246,11 +247,11 @@ function createTaco(selected, x, y, z, rot) {
   geometry = new THREE.CylinderGeometry(1, 2, 30);
   material = new THREE.MeshBasicMaterial({ color: 0xbe935a , wireframe: true });
 
-  xo[selected-1] = new THREE.Mesh(geometry, material);
-  taco.add(xo[selected-1]);
+  tacoMesh[selected-1] = new THREE.Mesh(geometry, material);
+  taco.add(tacoMesh[selected-1]);
 
-  xo[selected-1].position.set(x, y, z);
-  xo[selected-1].rotateZ(rot);
+  tacoMesh[selected-1].position.set(x, y, z);
+  tacoMesh[selected-1].rotateZ(rot);
   return taco
 }
 
@@ -259,11 +260,11 @@ function createTacoPoints(selected, x, y, z, rot) {
 
   geometry = new THREE.CylinderGeometry(1, 2, 30);
   material = new THREE.MeshBasicMaterial({ color: 0xbe935a , wireframe: true });
-  xo[selected-1] = new THREE.Mesh(geometry, material);
-  taco.add(xo[selected-1]);
+  tacoMesh[selected-1] = new THREE.Mesh(geometry, material);
+  taco.add(tacoMesh[selected-1]);
 
-  xo[selected-1].position.set(x, y, z);
-  xo[selected-1].rotateX(rot);
+  tacoMesh[selected-1].position.set(x, y, z);
+  tacoMesh[selected-1].rotateX(rot);
   return taco
 }
 

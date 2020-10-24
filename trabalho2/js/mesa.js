@@ -16,9 +16,12 @@ var size = 150;
 var tacoMesh = [];
 var BALLRADIUM = 2;
 var cameraIndex = 1, tacoSelected = 1;
+var ball, ballIndex = 1;
 var scene, renderer;
+var velocityball= [];
+var movimentBall= [];
 var geometry, material, mesh;
-var frontcam, topcam, latcam;
+var frontcam, topcam, cameraFollow;
 var aspect = window.innerWidth / window.innerHeight;
 
 function init() {
@@ -55,8 +58,17 @@ function render() {
     renderer.render(scene, topcam);
   } else if (cameraIndex == 2) {
     renderer.render(scene, frontcam);
+  } else if (cameraIndex == 3){
+    var camPosition = new THREE.Vector3(10, 0, 0);
+    var ballPosition = camPosition.applyMatrix4(ball.matrixWorld);
+
+    cameraFollow.position.x = ballPosition.x;
+    cameraFollow.position.y = ballPosition.y;
+    cameraFollow.position.z = ballPosition.z;
+    cameraFollow.lookAt(ball.position);
+
+    renderer.render(scene, cameraFollow);
   }
-  //else if (cameraIndex == 3) { renderer.render(scene, latcam) }
 }
 
 /*******************************************************************
@@ -73,6 +85,13 @@ function createScene() {
   createTable(0, 0, 0);
   createTacos();
   createHoles();
+  
+  for (var i = 1; i < 16; i++) {
+    var randFloatX = Math.random() * (10 - -10) + -10;
+    var randFloatZ = Math.random() * (35 - -35) + -35;
+    createBall(randFloatX,2.5,randFloatZ,i);
+  }
+  
 }
 
 /*******************************************************************
@@ -85,7 +104,7 @@ function createCameras() {
 
   createFrontCamera();
   createTopCamera();
-  createMovilCamera();
+  createFollowCamera();
 }
 
 function createFrontCamera() {
@@ -113,9 +132,17 @@ function createTopCamera() {
   scene.add(topcam);
 }
 
-function createMovilCamera() {
+function createFollowCamera() {
   "use strict";
 
+  cameraFollow = new THREE.PerspectiveCamera(45, aspect, 1, 1000);
+  //console.log("Ball "+String(ballIndex));
+  //var ballMovement = scene.getObjectByName(("Ball "+String(ballIndex)));
+  //cameraFollow.position.x = ballMovement.position.x;
+  //cameraFollow.position.y = ballMovement.position.y;
+  //cameraFollow.position.z = ballMovement.position.z;
+  //cameraFollow.lookAt(ballMovement.position);
+  scene.add(cameraFollow);
 }
 
 /*******************************************************************
@@ -171,6 +198,8 @@ function onKeyDown(e) {
   } else if (e.keyCode == 39) { //keyCode for right-arrow
     if (tacoSelected < 5) tacoMesh[tacoSelected - 1].rotateX(-Math.PI / 60);
     else tacoMesh[tacoSelected - 1].rotateZ(-Math.PI / 60);
+  } else if (e.keyCode == 32) { //keyCode for space
+  
   }
 
   tacoMesh[tacoSelected - 1].material.color.setHex(0x0000ff)
@@ -178,7 +207,9 @@ function onKeyDown(e) {
 
 function keyNotPressed(e) {
   "use strict";
-
+  if (e.keyCode == 32) { //keyCode for space
+  
+  }
 }
 
 /*******************************************************************
@@ -212,12 +243,12 @@ function createTable(x, y, z) {
 }
 
 function createTacos() {
-  scene.add(createTaco(1, 15, 22.5));
-  scene.add(createTaco(2, -15, 22.5));
-  scene.add(createTaco(3, 15, -22.5));
-  scene.add(createTaco(4, -15, -22.5));
-  scene.add(createTaco(5, 0, -45));
-  scene.add(createTaco(6, 0, 45));
+  scene.add(createTaco(1, 30, 22.5));
+  scene.add(createTaco(2, -30, 22.5));
+  scene.add(createTaco(3, 30, -22.5));
+  scene.add(createTaco(4, -30, -22.5));
+  scene.add(createTaco(5, 0, -60));
+  scene.add(createTaco(6, 0, 60));
   
   tacoMesh[tacoSelected - 1].material.color.setHex(0x0000ff);
 }
@@ -268,4 +299,27 @@ function createBottom(obj, x, y, z) {
   mesh = new THREE.Mesh(geometry, material);
   mesh.position.set(x, y, z);
   obj.add(mesh);
+}
+
+function createBall(x, y, z, index) {
+  ball = new THREE.Object3D();
+
+  // raio, heightsegment, withsegment
+  geometry = new THREE.SphereGeometry(2, 32, 32);
+  material = new THREE.MeshBasicMaterial({color: 0xbe935a, wireframe: true});
+  mesh = new THREE.Mesh(geometry, material);
+  ball.add(mesh);
+
+  movimentBall[index] = Math.random() * (2 - 0) + 0;
+  velocityball[index] = Math.random();
+  
+  ball.name = "Ball "+String (index);
+  ball.position.set(x, y, z);
+  ball.add(new THREE.AxisHelper(3));
+  scene.add(ball);
+}
+
+function ballRotation(ball){
+  var delta = clock.getDelta();
+  position = velocity * delta;
 }

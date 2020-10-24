@@ -69,6 +69,9 @@ function render() {
 
     renderer.render(scene, cameraFollow);
   }
+  for (var i = 1; i < 16; i++) {
+    ballRotation(i);
+  }
 }
 
 /*******************************************************************
@@ -311,7 +314,7 @@ function createBall(x, y, z, index) {
   ball.add(mesh);
 
   movimentBall[index] = Math.random() * (2 - 0) + 0;
-  velocityball[index] = Math.random();
+  velocityball[index] = Math.random() * (20 - 10) + 10;
   
   ball.name = "Ball "+String (index);
   ball.position.set(x, y, z);
@@ -319,7 +322,11 @@ function createBall(x, y, z, index) {
   scene.add(ball);
 }
 
-function ballRotation(ball){
-  var delta = clock.getDelta();
-  position = velocity * delta;
+function ballRotation(id){
+  var delta = clock.getDelta() * 2;
+  var position = velocityball[id] * delta;
+  //console.log(delta);
+  console.log(velocityball[id]);
+  //console.log(position);
+  scene.getObjectByName("Ball "+String(id)).translateX(position);
 }

@@ -97,7 +97,6 @@ function createScene() {
     createBall(randFloatX,2.5,randFloatZ,i);
   }
 
-  createBall(randFloatX,2.5,randFloatZ,i);
   createBallPrincipal(15-BALLRADIUM, 2.5, 22.5,1);
   createBallPrincipal(-15+BALLRADIUM, 2.5, 22.5,2);
   createBallPrincipal(15-BALLRADIUM, 2.5, -22.5, 3);
@@ -327,15 +326,17 @@ function createBall(x, y, z, index) {
   // raio, heightsegment, withsegment
   geometry = new THREE.SphereGeometry(BALLRADIUM, 32, 32);
   material = new THREE.MeshBasicMaterial({color: 0xbe935a, wireframe: true});
+
+  ball.name = "Ball "+String (index);
+  ball.position.set(x, 2.5, z);
+  ball.add(new THREE.AxisHelper(3));
+  
   mesh = new THREE.Mesh(geometry, material);
+  mesh.position.set(0,0,0);
   ball.add(mesh);
 
   movimentBall[index] = Math.random() * (2 - -2) + -2;
   velocityball[index] = Math.random() * (.1 - 0.05) + -0.05;
-  
-  ball.name = "Ball "+String (index);
-  ball.position.set(x, 2.5, z);
-  ball.add(new THREE.AxisHelper(3));
   scene.add(ball);
 }
 
@@ -358,7 +359,7 @@ function ballRotation(id){
   var position = movimentBall[id-1]*velocityball[id-1];
   scene.getObjectByName("Ball "+String(id)).translateX(position);
   scene.getObjectByName("Ball "+String(id)).translateZ(position);
-
+  //scene.getObjectByName("Ball "+String(id)).rotateZ(Math.PI/60);
 }
 
 function ballPRotation(id, moviment, velocity){

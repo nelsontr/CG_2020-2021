@@ -206,9 +206,11 @@ function onKeyDown(e) {
     tacoMesh[tacoSelected - 1].material.color.setHex(0xbe935a)
     tacoSelected = 6;
   } else if (e.keyCode == 37) { //keyCode for left-arrow
-    taco[tacoSelected - 1].rotateY(Math.PI / 60);
+    if (taco[tacoSelected - 1].rotation.y + Math.PI / 60 <= Math.PI/3)
+      taco[tacoSelected - 1].rotateY(Math.PI / 60);
   } else if (e.keyCode == 39) { //keyCode for right-arrow
-    taco[tacoSelected - 1].rotateY(-Math.PI / 60);
+    if (taco[tacoSelected - 1].rotation.y - Math.PI / 60 >= -Math.PI/3)
+      taco[tacoSelected - 1].rotateY(-Math.PI / 60);
   } else if (e.keyCode == 32) { //keyCode for space
   
   }

@@ -14,12 +14,14 @@
 var clock;
 var size = 150;
 var tacoMesh = [];
-var BALLRADIUM = 2;
+var BALLRADIUM = 1;
 var cameraIndex = 1, tacoSelected = 1;
 var ball, ballIndex = 1;
+var taco = [];
 var scene, renderer;
 var velocityball= [];
 var movimentBall= [];
+var ballP= [];
 var geometry, material, mesh;
 var frontcam, topcam, cameraFollow;
 var aspect = window.innerWidth / window.innerHeight;
@@ -60,12 +62,12 @@ function render() {
     renderer.render(scene, frontcam);
   } else if (cameraIndex == 3){
     var camPosition = new THREE.Vector3(10, 0, 0);
-    var ballPosition = camPosition.applyMatrix4(ball.matrixWorld);
+    var ballPosition = camPosition.applyMatrix4(ballP[tacoSelected-1].matrixWorld);
 
     cameraFollow.position.x = ballPosition.x;
     cameraFollow.position.y = ballPosition.y;
     cameraFollow.position.z = ballPosition.z;
-    cameraFollow.lookAt(ball.position);
+    cameraFollow.lookAt(ballP[tacoSelected-1].position);
 
     renderer.render(scene, cameraFollow);
   }
@@ -94,6 +96,14 @@ function createScene() {
     var randFloatZ = Math.random() * (35 - -35) + -35;
     createBall(randFloatX,2.5,randFloatZ,i);
   }
+
+  createBall(randFloatX,2.5,randFloatZ,i);
+  createBallPrincipal(15-BALLRADIUM, 2.5, 22.5,1);
+  createBallPrincipal(-15+BALLRADIUM, 2.5, 22.5,2);
+  createBallPrincipal(15-BALLRADIUM, 2.5, -22.5, 3);
+  createBallPrincipal(-15+BALLRADIUM, 2.5, -22.5,4);
+  createBallPrincipal(0, 2.5, 44.5-BALLRADIUM,5);
+  createBallPrincipal(0, 2.5, -44.5+BALLRADIUM,6);
   
 }
 
@@ -196,11 +206,9 @@ function onKeyDown(e) {
     tacoMesh[tacoSelected - 1].material.color.setHex(0xbe935a)
     tacoSelected = 6;
   } else if (e.keyCode == 37) { //keyCode for left-arrow
-    if (tacoSelected < 5) tacoMesh[tacoSelected - 1].rotateX(Math.PI / 60);
-    else tacoMesh[tacoSelected - 1].rotateZ(Math.PI / 60);
+    taco[tacoSelected - 1].rotateY(Math.PI / 60);
   } else if (e.keyCode == 39) { //keyCode for right-arrow
-    if (tacoSelected < 5) tacoMesh[tacoSelected - 1].rotateX(-Math.PI / 60);
-    else tacoMesh[tacoSelected - 1].rotateZ(-Math.PI / 60);
+    taco[tacoSelected - 1].rotateY(-Math.PI / 60);
   } else if (e.keyCode == 32) { //keyCode for space
   
   }
@@ -246,12 +254,12 @@ function createTable(x, y, z) {
 }
 
 function createTacos() {
-  scene.add(createTaco(1, 30, 22.5));
-  scene.add(createTaco(2, -30, 22.5));
-  scene.add(createTaco(3, 30, -22.5));
-  scene.add(createTaco(4, -30, -22.5));
-  scene.add(createTaco(5, 0, -60));
-  scene.add(createTaco(6, 0, 60));
+  scene.add(createTaco(1, 15, 22.5));
+  scene.add(createTaco(2, -15, 22.5));
+  scene.add(createTaco(3, 15, -22.5));
+  scene.add(createTaco(4, -15, -22.5));
+  scene.add(createTaco(5, 0, -45.5));
+  scene.add(createTaco(6, 0, 45.5));
   
   tacoMesh[tacoSelected - 1].material.color.setHex(0x0000ff);
 }
@@ -265,12 +273,12 @@ function createHole(hole, x, z, y=0) {
   hole.add(mesh);
 }
 
-function createTaco(selected, x, z) {
+function createTaco(selected, xt, zt) {
   
   if (selected % 2 != 0) var rot = Math.PI / 2
   else var rot = -Math.PI / 2
   
-  var taco = new THREE.Object3D();
+  taco[selected-1] = new THREE.Object3D();
   geometry = new THREE.CylinderGeometry(1, 2, 30);
   material = new THREE.MeshBasicMaterial({ color: 0xbe935a, wireframe: true });
 
@@ -278,9 +286,16 @@ function createTaco(selected, x, z) {
   if (selected < 5) tacoMesh[selected - 1].rotateZ(rot);
   else tacoMesh[selected - 1].rotateX(rot);
 
-  tacoMesh[selected - 1].position.set(x, 2.5, z);
-  taco.add(tacoMesh[selected - 1]);
-  return taco
+  taco[selected-1].position.set(xt,2.5,zt);
+  if (xt>0) tacoMesh[selected - 1].position.set(15, 0, 0);
+  else if (xt<0) tacoMesh[selected - 1].position.set(-15, 0, 0);
+  
+  if (selected>=5) 
+    if (zt>0) tacoMesh[selected - 1].position.set(0, 0, 15);
+    else tacoMesh[selected - 1].position.set(0, 0, -15);
+
+  taco[selected-1].add(tacoMesh[selected - 1]);
+  return taco[selected-1]
 }
 
 function createWall(obj, x, z, size = 30) {
@@ -308,25 +323,38 @@ function createBall(x, y, z, index) {
   ball = new THREE.Object3D();
 
   // raio, heightsegment, withsegment
-  geometry = new THREE.SphereGeometry(2, 32, 32);
+  geometry = new THREE.SphereGeometry(BALLRADIUM, 32, 32);
   material = new THREE.MeshBasicMaterial({color: 0xbe935a, wireframe: true});
   mesh = new THREE.Mesh(geometry, material);
   ball.add(mesh);
 
-  movimentBall[index] = Math.random() * (2 - 0) + 0;
-  velocityball[index] = Math.random() * (20 - 10) + 10;
+  movimentBall[index] = Math.random() * (2 - -2) + -2;
+  velocityball[index] = Math.random() * (.1 - 0.05) + -0.05;
   
   ball.name = "Ball "+String (index);
-  ball.position.set(x, y, z);
+  ball.position.set(x, 2.5, z);
   ball.add(new THREE.AxisHelper(3));
   scene.add(ball);
 }
 
+function createBallPrincipal(x, y, z, index) {
+  ballP[index-1] = new THREE.Object3D();
+
+  // raio, heightsegment, withsegment
+  geometry = new THREE.SphereGeometry(BALLRADIUM, 32, 32);
+  material = new THREE.MeshBasicMaterial({color: 0xcccccc, wireframe: true});
+  mesh = new THREE.Mesh(geometry, material);
+  ballP[index-1].add(mesh);
+  
+  ballP[index-1].name = "BallP "+String (index);
+  ballP[index-1].position.set(x, 2.5, z);
+  ballP[index-1].add(new THREE.AxisHelper(3));
+  scene.add(ballP[index-1]);
+}
+
 function ballRotation(id){
-  var delta = clock.getDelta() * 2;
-  var position = velocityball[id] * delta;
-  //console.log(delta);
-  console.log(velocityball[id]);
-  //console.log(position);
+  var position = movimentBall[id]*velocityball[id];
   scene.getObjectByName("Ball "+String(id)).translateX(position);
+  scene.getObjectByName("Ball "+String(id)).translateZ(position);
+
 }

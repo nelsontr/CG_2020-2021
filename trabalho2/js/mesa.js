@@ -102,8 +102,8 @@ function createScene() {
   createBallPrincipal(-15+BALLRADIUM, 2.5, 22.5,2);
   createBallPrincipal(15-BALLRADIUM, 2.5, -22.5, 3);
   createBallPrincipal(-15+BALLRADIUM, 2.5, -22.5,4);
-  createBallPrincipal(0, 2.5, 44.5-BALLRADIUM,5);
-  createBallPrincipal(0, 2.5, -44.5+BALLRADIUM,6);
+  createBallPrincipal(0, 2.5, -44.5+BALLRADIUM,5);
+  createBallPrincipal(0, 2.5, 44.5-BALLRADIUM,6);
   
 }
 
@@ -212,7 +212,7 @@ function onKeyDown(e) {
     if (taco[tacoSelected - 1].rotation.y - Math.PI / 60 >= -Math.PI/3)
       taco[tacoSelected - 1].rotateY(-Math.PI / 60);
   } else if (e.keyCode == 32) { //keyCode for space
-  
+
   }
 
   tacoMesh[tacoSelected - 1].material.color.setHex(0x0000ff)
@@ -221,7 +221,7 @@ function onKeyDown(e) {
 function keyNotPressed(e) {
   "use strict";
   if (e.keyCode == 32) { //keyCode for space
-  
+
   }
 }
 
@@ -256,12 +256,12 @@ function createTable(x, y, z) {
 }
 
 function createTacos() {
-  scene.add(createTaco(1, 15, 22.5));
-  scene.add(createTaco(2, -15, 22.5));
-  scene.add(createTaco(3, 15, -22.5));
-  scene.add(createTaco(4, -15, -22.5));
-  scene.add(createTaco(5, 0, -45.5));
-  scene.add(createTaco(6, 0, 45.5));
+  scene.add(createTaco(1, 15-BALLRADIUM, 22.5));
+  scene.add(createTaco(2, -15+BALLRADIUM, 22.5));
+  scene.add(createTaco(3, 15-BALLRADIUM, -22.5));
+  scene.add(createTaco(4, -15+BALLRADIUM, -22.5));
+  scene.add(createTaco(5, 0, -45.5+BALLRADIUM));
+  scene.add(createTaco(6, 0, 45.5-BALLRADIUM));
   
   tacoMesh[tacoSelected - 1].material.color.setHex(0x0000ff);
 }
@@ -283,18 +283,18 @@ function createTaco(selected, xt, zt) {
   taco[selected-1] = new THREE.Object3D();
   geometry = new THREE.CylinderGeometry(1, 2, 30);
   material = new THREE.MeshBasicMaterial({ color: 0xbe935a, wireframe: true });
-
   tacoMesh[selected - 1] = new THREE.Mesh(geometry, material);
+
   if (selected < 5) tacoMesh[selected - 1].rotateZ(rot);
   else tacoMesh[selected - 1].rotateX(rot);
 
   taco[selected-1].position.set(xt,2.5,zt);
-  if (xt>0) tacoMesh[selected - 1].position.set(15, 0, 0);
-  else if (xt<0) tacoMesh[selected - 1].position.set(-15, 0, 0);
+  if (xt>0) tacoMesh[selected - 1].position.set(15+BALLRADIUM, 0, 0);
+  else if (xt<0) tacoMesh[selected - 1].position.set(-15-BALLRADIUM, 0, 0);
   
   if (selected>=5) 
-    if (zt>0) tacoMesh[selected - 1].position.set(0, 0, 15);
-    else tacoMesh[selected - 1].position.set(0, 0, -15);
+    if (zt>0) tacoMesh[selected - 1].position.set(0, 0, 15+BALLRADIUM);
+    else tacoMesh[selected - 1].position.set(0, 0, -15-BALLRADIUM);
 
   taco[selected-1].add(tacoMesh[selected - 1]);
   return taco[selected-1]
@@ -355,8 +355,14 @@ function createBallPrincipal(x, y, z, index) {
 }
 
 function ballRotation(id){
-  var position = movimentBall[id]*velocityball[id];
+  var position = movimentBall[id-1]*velocityball[id-1];
   scene.getObjectByName("Ball "+String(id)).translateX(position);
   scene.getObjectByName("Ball "+String(id)).translateZ(position);
 
+}
+
+function ballPRotation(id, moviment, velocity){
+  var position = moviment*velocity;
+  scene.getObjectByName("BallP "+String(id)).translateX(position);
+  scene.getObjectByName("BallP "+String(id)).translateZ(position);
 }

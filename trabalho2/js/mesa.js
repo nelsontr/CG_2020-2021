@@ -20,8 +20,20 @@ var ball, ballIndex = 1;
 var taco = [];
 var scene, renderer;
 var velocityball= [];
-var movimentBall= [];
 var ballP= [];
+var taco_selecionado;
+var movimentBallX= [];
+var movimentBallY= [];
+var movimentBallZ= [];
+var rotacaotaco = [];
+
+var wall_width = [];
+var wall_height = [];
+var wall_lenght = [];
+
+var raio_ball = [];
+var numero_bolas = 16;
+var space;
 var geometry, material, mesh;
 var frontcam, topcam, cameraFollow;
 var aspect = window.innerWidth / window.innerHeight;
@@ -47,14 +59,13 @@ function init() {
 function animate() {
   "use strict";
 
-  requestAnimationFrame(animate);
+  moviment_function();
   render();
+  requestAnimationFrame(animate);
 }
 
 function render() {
   "use strict";
-
-  renderer.render(scene, frontcam);
 
   if (cameraIndex == 1) {
     renderer.render(scene, topcam);
@@ -71,9 +82,7 @@ function render() {
 
     renderer.render(scene, cameraFollow);
   }
-  for (var i = 1; i < 16; i++) {
-    ballRotation(i);
-  }
+
 }
 
 /*******************************************************************
@@ -91,7 +100,7 @@ function createScene() {
   createTacos();
   createHoles();
   
-  for (var i = 1; i < 16; i++) {
+  for (var i = 1; i < numero_bolas; i++) {
     var randFloatX = Math.random() * (10 - -10) + -10;
     var randFloatZ = Math.random() * (35 - -35) + -35;
     createBall(randFloatX,2.5,randFloatZ,i);
@@ -103,6 +112,8 @@ function createScene() {
   createBallPrincipal(-15+BALLRADIUM, 2.5, -22.5,4);
   createBallPrincipal(0, 2.5, -44.5+BALLRADIUM,5);
   createBallPrincipal(0, 2.5, 44.5-BALLRADIUM,6);
+
+
   
 }
 
@@ -148,12 +159,7 @@ function createFollowCamera() {
   "use strict";
 
   cameraFollow = new THREE.PerspectiveCamera(45, aspect, 1, 1000);
-  //console.log("Ball "+String(ballIndex));
-  //var ballMovement = scene.getObjectByName(("Ball "+String(ballIndex)));
-  //cameraFollow.position.x = ballMovement.position.x;
-  //cameraFollow.position.y = ballMovement.position.y;
-  //cameraFollow.position.z = ballMovement.position.z;
-  //cameraFollow.lookAt(ballMovement.position);
+
   scene.add(cameraFollow);
 }
 
@@ -207,20 +213,24 @@ function onKeyDown(e) {
   } else if (e.keyCode == 37) { //keyCode for left-arrow
     if (taco[tacoSelected - 1].rotation.y + Math.PI / 60 <= Math.PI/3)
       taco[tacoSelected - 1].rotateY(Math.PI / 60);
+      rotacaotaco[tacoSelected - 1] = taco[tacoSelected - 1].rotation.y;
   } else if (e.keyCode == 39) { //keyCode for right-arrow
     if (taco[tacoSelected - 1].rotation.y - Math.PI / 60 >= -Math.PI/3)
       taco[tacoSelected - 1].rotateY(-Math.PI / 60);
   } else if (e.keyCode == 32) { //keyCode for space
+    space = true;
 
   }
 
   tacoMesh[tacoSelected - 1].material.color.setHex(0x0000ff)
 }
 
+
+
 function keyNotPressed(e) {
   "use strict";
   if (e.keyCode == 32) { //keyCode for space
-
+    space = false;
   }
 }
 
@@ -245,10 +255,10 @@ function createTable(x, y, z) {
   var table = new THREE.Object3D();
 
   createBottom(table, 0, 0, 0);
-  createWall(table, -15.5, 0, 90);
-  createWall(table, 15.5, 0, 90);
-  createWall(table, 0, 45.5);
-  createWall(table, 0, -45.5);
+  createWall(table, -15.5, 0, 90, 1);
+  createWall(table, 15.5, 0, 90, 2);
+  createWall(table, 0, 45.5, 30, 3);
+  createWall(table, 0, -45.5, 30, 4);
 
   scene.add(table);
   table.position.set(x, y, z)
@@ -299,16 +309,35 @@ function createTaco(selected, xt, zt) {
   return taco[selected-1]
 }
 
-function createWall(obj, x, z, size = 30) {
+function createWall(table, x, z, size, index) {
+  var wall =  new THREE.Object3D();
   geometry = new THREE.CubeGeometry(5, 1, size);
   material = new THREE.MeshBasicMaterial({ color: 0xffa500, wireframe: true });
+
+  wall.name = "Wall "+String (index);
   mesh = new THREE.Mesh(geometry, material);
 
   mesh.rotateZ(Math.PI / 2);
   if (size == 30) mesh.rotateX(Math.PI / 2);
 
   mesh.position.set(x, 3, z);
-  obj.add(mesh);
+  wall.add(mesh);
+
+  if( size == 90){
+    wall_width[index] = size;
+    wall_height[index] = 1;
+    wall_lenght[index] = 5;
+    
+  }
+
+  if( size == 30){
+    wall_width[index] = 5;
+    wall_height[index] = 1;
+    wall_lenght[index] = size;
+    
+  }
+
+  table.add(wall);
 }
 
 
@@ -335,10 +364,15 @@ function createBall(x, y, z, index) {
   mesh.position.set(0,0,0);
   ball.add(mesh);
 
-  movimentBall[index] = Math.random() * (2 - -2) + -2;
+  //movimentBall[index] = new THREE.Vector3(Math.random(), 0, Math.random());
+  movimentBallX[index] = Math.random() * (2 - -2) + -2;
+  movimentBallY[index] = 0;
+  movimentBallZ[index] = Math.random() * (2 - -2) + -2;
   velocityball[index] = Math.random() * (.1 - 0.05) + -0.05;
+  raio_ball[index] = BALLRADIUM;
   scene.add(ball);
 }
+
 
 function createBallPrincipal(x, y, z, index) {
   ballP[index-1] = new THREE.Object3D();
@@ -355,15 +389,228 @@ function createBallPrincipal(x, y, z, index) {
   scene.add(ballP[index-1]);
 }
 
-function ballRotation(id){
-  var position = movimentBall[id-1]*velocityball[id-1];
+function ballRotation(id, delta){
+
+
+  let position = movimentBallX[id]*velocityball[id];
+  let position2 = movimentBallZ[id]*velocityball[id];
+  let position3 = movimentBallY[id]*velocityball[id];
   scene.getObjectByName("Ball "+String(id)).translateX(position);
-  scene.getObjectByName("Ball "+String(id)).translateZ(position);
-  //scene.getObjectByName("Ball "+String(id)).rotateZ(Math.PI/60);
+  scene.getObjectByName("Ball "+String(id)).translateZ(position2);
+  scene.getObjectByName("Ball "+String(id)).translateY(position3);
 }
 
-function ballPRotation(id, moviment, velocity){
-  var position = moviment*velocity;
-  scene.getObjectByName("BallP "+String(id)).translateX(position);
-  scene.getObjectByName("BallP "+String(id)).translateZ(position);
+function moviment_function(){
+
+  var delta = clock.getDelta() * 2;
+
+    for (let f = 1; f < numero_bolas; f++) {
+    collision(f, delta);
+  }
+
+  for (let i = 1; i < numero_bolas; i++) {
+    ballRotation(i, delta);
+  }
+
+
+  if(space == true){
+    numero_bolas++;
+    if( tacoSelected == 1){
+      createBall(15-BALLRADIUM, 2.5, 22.5,numero_bolas-1);
+    }
+        if( tacoSelected == 2){
+       createBall(-15+BALLRADIUM, 2.5, 22.5,numero_bolas-1);
+    }
+        if( tacoSelected == 3){
+      createBall(15-BALLRADIUM, 2.5, -22.5, numero_bolas-1);
+    }
+        if( tacoSelected == 4){
+      createBall(-15+BALLRADIUM, 2.5, -22.5,numero_bolas-1);
+    }
+        if( tacoSelected == 5){
+      createBall(0, 2.5, -44.5+BALLRADIUM,numero_bolas-1);
+    }
+        if( tacoSelected == 6){
+      createBall(0, 2.5, 44.5-BALLRADIUM,numero_bolas-1);
+    }
+
+    
+    //scene.getObjectByName("Ball "+String(numero_bolas)).mesh.color.setHex(0xcccccc);
+    movimentBallX[numero_bolas] = rotacaotaco[tacoSelected-1];
+    movimentBallY[numero_bolas] = 0;
+    movimentBallZ[numero_bolas] = rotacaotaco[tacoSelected-1];
+    velocityball[numero_bolas] = 10;
+
+  }
+
+}
+
+function collision(bola_a, delta) {
+
+  for (let b = 1; b < numero_bolas; b++) {
+    /* When colliding with other ball */
+    // Intersection between Sphere and Sphere
+    if(intersect_sphere_sphere(bola_a, b)){
+      elastic_collision(bola_a, b);
+    }
+
+  }
+
+  for (let c = 1; c < 5; c++) {
+    /* When colliding with wall rebound */
+    //Intersection between Sphere and Cube
+    if(intersect_sphere_cube(bola_a, c)){
+      rebound_colision(bola_a);
+    }
+  }
+
+  if(intersect_object_plane(bola_a)){
+    fallOffTable(bola_a);
+
+  }
+}
+
+function intersect_sphere_sphere(bola_a, bola_b){
+
+  let ra = raio_ball[bola_a];
+  let rb = raio_ball[bola_b];
+
+  let xa = scene.getObjectByName("Ball "+String(bola_a)).position.x;
+  let ya = scene.getObjectByName("Ball "+String(bola_a)).position.y;
+  let za = scene.getObjectByName("Ball "+String(bola_a)).position.z;
+  let xb = scene.getObjectByName("Ball "+String(bola_b)).position.x;
+  let yb = scene.getObjectByName("Ball "+String(bola_b)).position.y;
+  let zb = scene.getObjectByName("Ball "+String(bola_b)).position.z;
+
+  let x = (xb-xa)^2 + (yb-ya)^2 + (zb-za)^2
+  let distancia = Math.sqrt(x);
+
+  if (ra+rb >= distancia){
+    //console.log('estao a bater'+String(bola_a)+String(bola_b) );
+    return true;
+
+
+  }
+
+  else{
+
+    return false;
+  }
+
+}
+
+function intersect_sphere_cube(bola_a, wall_b){
+/*
+  let parede_b_width = wall_b[0]/2;
+  let parede_b_height = wall_b[1]/2;
+  let parede_b_lenght = wall_b[2]/2;
+
+  let parede_b_max_x = scene.getObjectByName("Wall "+String(wall_b)).position.x + parede_b_width; 
+  let parede_b_max_y = scene.getObjectByName("Wall "+String(wall_b)).position.y + parede_b_height; 
+  let parede_b_max_z = scene.getObjectByName("Wall "+String(wall_b)).position.z + parede_b_lenght;
+
+  let parede_b_min_x = scene.getObjectByName("Wall "+String(wall_b)).position.x - parede_b_width;
+  let parede_b_min_y = scene.getObjectByName("Wall "+String(wall_b)).position.y - parede_b_height;
+  let parede_b_min_z = scene.getObjectByName("Wall "+String(wall_b)).position.z - parede_b_lenght;
+*/
+  /* Sphere Properties */
+  /* Width here it's the radius of the sphere */
+/*
+  let bola_a_width = raio_ball[bola_a];
+
+  let a_max_x = scene.getObjectByName("Ball "+String(bola_a)).object.position.x + bola_a_width;
+  let a_max_y = scene.getObjectByName("Ball "+String(bola_a)).object.position.y + bola_a_width;
+  let a_max_z = scene.getObjectByName("Ball "+String(bola_a)).object.position.z + bola_a_width;
+
+  let a_min_x = scene.getObjectByName("Ball "+String(bola_a)).object.position.x - bola_a_width;
+  let a_min_y = scene.getObjectByName("Ball "+String(bola_a)).object.position.y - bola_a_width;
+  let a_min_z = scene.getObjectByName("Ball "+String(bola_a)).object.position.z - bola_a_width;
+*/
+  /* MATH EXPLANATION */
+  /* Bounding box extreme points comparison */
+
+/*
+  let test_x = (a_max_x >= b_min_x && a_min_x <= b_max_x);
+  let test_y = (a_max_y >= b_min_y && a_min_y <= b_max_y);
+  let test_z = (a_max_z >= b_min_z && a_min_z <= b_max_z);
+
+
+  if(test_x == true && test_z == true && test_y == true){
+    return true;
+  }
+  else{
+    return false;
+  }
+
+*/
+
+}
+
+function elastic_collision(bola_a, bola_b){
+
+
+  let velocity_a_old = velocityball[bola_a];
+  let velocity_b_old = velocityball[bola_b];
+
+  let moviment_direction_X_a = movimentBallX[bola_a];
+  let moviment_direction_Y_a = movimentBallY[bola_a];
+  let moviment_direction_Z_a = movimentBallZ[bola_a];
+
+  let moviment_direction_X_b = movimentBallX[bola_b];
+  let moviment_direction_Y_b = movimentBallY[bola_b];
+  let moviment_direction_Z_b = movimentBallZ[bola_b];
+
+
+  velocityball[bola_a] = velocity_b_old;
+  velocityball[bola_b] = velocity_a_old;
+
+  movimentBallX[bola_a] = -moviment_direction_X_a;
+  movimentBallY[bola_a] = -moviment_direction_Y_a;
+  movimentBallZ[bola_a] = -moviment_direction_Z_a;
+
+  movimentBallX[bola_b] = -moviment_direction_X_b;
+  movimentBallY[bola_b] = -moviment_direction_Y_b;
+  movimentBallZ[bola_b] = -moviment_direction_Z_b;
+
+}
+
+function rebound_colision(bola_a){
+
+
+  let moviment_direction_X_a = movimentBallX[bola_a];
+  let moviment_direction_Y_a = movimentBallY[bola_a];
+  let moviment_direction_Z_a = movimentBallZ[bola_a];
+
+  movimentBallX[bola_a] = -moviment_direction_X_a;
+  movimentBallY[bola_a] = -moviment_direction_Y_a;
+  movimentBallZ[bola_a] = -moviment_direction_Z_a;
+
+
+
+}
+
+function intersect_object_plane(bola_a){
+
+
+let bola_a_x = scene.getObjectByName("Ball "+String(bola_a)).position.x;
+let bola_a_y = scene.getObjectByName("Ball "+String(bola_a)).position.y;
+let bola_a_z = scene.getObjectByName("Ball "+String(bola_a)).position.z;
+
+  if( (bola_a_z<= -37 && bola_a_x <= -7) || (bola_a_z<= -37 && bola_a_x >= 7) || (bola_a_z>= 37 && bola_a_x <= -7) || (bola_a_z>= 37 && bola_a_x >= 7)){
+    return true;
+
+  }
+  else{
+    return false;
+  }
+  
+}
+
+function fallOffTable(bola_a){
+
+  velocityball[bola_a] = 1;
+  movimentBallX[bola_a] = 0;
+  movimentBallY[bola_a] = -1
+  movimentBallX[bola_a] = 0;
+
 }

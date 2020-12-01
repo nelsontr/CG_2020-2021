@@ -1,6 +1,6 @@
 # CG_2020-2021
 
-### Trabalhos em Andamento - [Aqui](trabalho4/)
+### <s>Trabalhos em Andamento - [Aqui](trabalho4/)</s>
 
 ### Entregues
 - [Trabalho1](trabalho1/)

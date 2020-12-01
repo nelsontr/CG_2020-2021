@@ -13,7 +13,6 @@
 var clock;
 var geometry, material, mesh;
 var scene, renderer;
-var cameraIndex = 1;
 var frontcam;
 var board, ball;
 var bandeira;
@@ -76,11 +75,6 @@ function animate() {
 
 function render() {
   "use strict";
-
-  if (cameraIndex == 1) {
-    renderer.render(scene, frontcam);
-  }
-
   renderer.render(scene, frontcam);
 }
 
@@ -148,10 +142,8 @@ function onResize() {
 
 function onKeyDown(e) {
   "use strict";
-
-  if (e.keyCode == 49) {
-    cameraIndex = 1;
-  } else if (e.keyCode == 68) {
+  
+  if (e.keyCode == 68) {
     // keyCode tecla D - luz direcional
     if (light_on == true) {
       light_on = false;
@@ -447,7 +439,6 @@ function update_movimento_bandeira() {
 
     ball.translateX(positionX);
     ball.translateZ(positionX);
-
     ball.translateY(position);
   }
 }
@@ -469,10 +460,3 @@ function restartGame() {
   pause = false;
   frontcam.remove(cubeCam);
 }
-
-/*
-	var currentFrameTime = Date.now(),
-		deltaT = (paused || gameOver) ? 0 : currentFrameTime - previousFrameTime;
-
-
-		~*/

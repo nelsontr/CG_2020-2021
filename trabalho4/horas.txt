@@ -1,0 +1,11 @@
+/*******************************************************************
+ * Trabalho Laboratorial de CG #4
+ *
+ * GRUPO 4:
+ *    Beatriz Alves, 93691
+ *    Gonçalo Castilho, 84722
+ *    Nelson Trindade, 93743
+ *
+/*******************************************************************/
+
+Média do tempo dispendido para a realização deste trabalho: 10 Horas por elemento.
